@@ -1,0 +1,1081 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Class Swap Matcher</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #0066ff;
+            --primary-dark: #0052cc;
+            --success: #00b894;
+            --warning: #fdcb6e;
+            --danger: #d63031;
+            --bg-main: #fafbfc;
+            --bg-card: #ffffff;
+            --text-primary: #1a1a1a;
+            --text-secondary: #666666;
+            --border: #e1e4e8;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
+            --shadow-lg: 0 12px 32px rgba(0,0,0,0.12);
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+            color: var(--text-primary);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 48px;
+            animation: fadeInDown 0.6s ease-out;
+        }
+
+        .header h1 {
+            font-size: 48px;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 12px;
+            text-shadow: 0 2px 12px rgba(0,0,0,0.2);
+        }
+
+        .header p {
+            font-size: 18px;
+            color: rgba(255,255,255,0.9);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        @media (max-width: 1200px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: var(--shadow-lg);
+            animation: fadeInUp 0.6s ease-out;
+            animation-fill-mode: backwards;
+        }
+
+        .card:nth-child(2) { animation-delay: 0.1s; }
+        .card:nth-child(3) { animation-delay: 0.2s; }
+
+        .card h2 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 24px;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .card h2::before {
+            content: '';
+            width: 4px;
+            height: 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 2px;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            font-size: 15px;
+            font-family: 'DM Sans', sans-serif;
+            transition: all 0.3s ease;
+            background: var(--bg-main);
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: white;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .preference-section {
+            background: var(--bg-main);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 16px;
+        }
+
+        .preference-section h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: var(--text-secondary);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 16px 24px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'DM Sans', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 4px 16px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 24px rgba(102, 126, 234, 0.5);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .banner {
+            padding: 16px 24px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            font-weight: 500;
+            animation: slideInDown 0.4s ease-out;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .banner-success {
+            background: linear-gradient(135deg, #00b894 0%, #00cec9 100%);
+            color: white;
+        }
+
+        .banner-info {
+            background: linear-gradient(135deg, #74b9ff 0%, #a29bfe 100%);
+            color: white;
+        }
+
+        .banner-warning {
+            background: linear-gradient(135deg, #fdcb6e 0%, #ffeaa7 100%);
+            color: #2d3436;
+        }
+
+        .request-item {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 16px;
+            border-left: 4px solid var(--primary);
+            transition: all 0.3s ease;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        .request-item:hover {
+            transform: translateX(4px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .request-item.matched {
+            border-left-color: var(--success);
+            opacity: 0.7;
+            text-decoration: line-through;
+        }
+
+        .request-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 12px;
+        }
+
+        .request-name {
+            font-weight: 700;
+            font-size: 18px;
+            color: var(--text-primary);
+        }
+
+        .request-date {
+            font-size: 13px;
+            color: var(--text-secondary);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .course-info {
+            margin: 8px 0;
+            padding: 12px;
+            background: var(--bg-main);
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .course-label {
+            font-weight: 600;
+            color: var(--text-secondary);
+            font-size: 12px;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+
+        .course-details {
+            color: var(--text-primary);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+        }
+
+        .match-result {
+            background: linear-gradient(135deg, #00b894 0%, #00cec9 100%);
+            padding: 32px;
+            border-radius: 16px;
+            margin-bottom: 24px;
+            color: white;
+            animation: bounceIn 0.6s ease-out;
+        }
+
+        .match-result h3 {
+            font-size: 28px;
+            margin-bottom: 24px;
+            text-align: center;
+        }
+
+        .match-pair {
+            background: rgba(255,255,255,0.2);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 16px;
+        }
+
+        .match-arrow {
+            text-align: center;
+            font-size: 32px;
+            margin: 16px 0;
+        }
+
+        .circular-match {
+            background: linear-gradient(135deg, #a29bfe 0%, #fd79a8 100%);
+        }
+
+        .circular-match h3 {
+            margin-bottom: 16px;
+        }
+
+        .circular-chain {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .chain-step {
+            background: rgba(255,255,255,0.2);
+            backdrop-filter: blur(10px);
+            padding: 16px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .step-number {
+            background: white;
+            color: #a29bfe;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 48px 24px;
+            color: var(--text-secondary);
+        }
+
+        .empty-state-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+            opacity: 0.3;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-100%);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+
+        @keyframes bounceIn {
+            0% {
+                opacity: 0;
+                transform: scale(0.3);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1.05);
+            }
+            70% {
+                transform: scale(0.9);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .color-code {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 12px;
+            margin-left: 8px;
+        }
+
+        .color-GOLD { background: #ffd700; color: #000; }
+        .color-SILVER { background: #c0c0c0; color: #000; }
+        .color-GREEN { background: #00b894; color: #fff; }
+        .color-BLUE { background: #0984e3; color: #fff; }
+        .color-RED { background: #d63031; color: #fff; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔄 Class Swap Matcher</h1>
+            <p>Find your perfect class swap match with intelligent matching algorithms</p>
+        </div>
+
+        <div id="bannerContainer"></div>
+        <div id="matchResultContainer"></div>
+
+        <div class="grid">
+            <div class="card">
+                <h2>Submit Swap Request</h2>
+                <form id="swapForm">
+                    <div class="form-group">
+                        <label for="entryDate">Entry Date (MM/DD/YY) *</label>
+                        <input type="text" id="entryDate" required placeholder="12/08/25">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="studentName">Student Name (Last, First) *</label>
+                        <input type="text" id="studentName" required placeholder="Doe, John">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="netId">Net ID *</label>
+                        <input type="text" id="netId" required placeholder="jd1234">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">Email (for match notifications) *</label>
+                        <input type="email" id="email" required placeholder="john.doe@yale.edu">
+                    </div>
+
+                    <div class="preference-section">
+                        <h3>Current Class</h3>
+                        <div class="form-group">
+                            <label for="currentCourse">Current Course *</label>
+                            <select id="currentCourse" required>
+                                <option value="">Select your current class...</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="preference-section">
+                        <h3>Desired Classes (in order of preference)</h3>
+                        <div class="form-group">
+                            <label for="pref1">1st Preference *</label>
+                            <select id="pref1" required>
+                                <option value="">Select 1st preference...</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="pref2">2nd Preference</label>
+                            <select id="pref2">
+                                <option value="">Select 2nd preference...</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="pref3">3rd Preference</label>
+                            <select id="pref3">
+                                <option value="">Select 3rd preference...</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Submit Preference</button>
+                </form>
+            </div>
+
+            <div class="card">
+                <h2>Active Swap Requests</h2>
+                <div id="activeRequests">
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📋</div>
+                        <p>No active requests yet. Submit the first one!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Match History</h2>
+            <div id="matchHistory">
+                <div class="empty-state">
+                    <div class="empty-state-icon">✨</div>
+                    <p>No matches found yet. Matches will appear here once connections are made.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Wait for DOM to be fully loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded, initializing app...');
+            
+            // Course data
+            const courses = [
+                { code: "MGT 408-01", name: "Introduction to Negotiation", color: "GOLD", crn: "21927", time: "W 10:10am - 12:10pm", semester: "spring-1" },
+                { code: "MGT 408-02", name: "Introduction to Negotiation", color: "SILVER", crn: "21928", time: "W 01:00pm - 03:00pm", semester: "spring-1" },
+                { code: "MGT 408-03", name: "Introduction to Negotiation", color: "GREEN", crn: "21929", time: "W 03:10pm - 05:10pm", semester: "spring-1" },
+                { code: "MGT 408-04", name: "Introduction to Negotiation", color: "BLUE", crn: "21930", time: "Th 10:10am - 12:10pm", semester: "spring-1" },
+                { code: "MGT 408-05", name: "Introduction to Negotiation", color: "RED", crn: "21931", time: "Th 01:00pm - 03:00pm", semester: "spring-1" },
+                { code: "MGT 420-01", name: "The Workforce", color: "SILVER", crn: "21934", time: "MW 08:30am - 09:50am", semester: "spring-1" },
+                { code: "MGT 420-02", name: "The Workforce", color: "RED", crn: "21937", time: "MW 10:10am - 11:30am", semester: "spring-1" },
+                { code: "MGT 420-03", name: "The Workforce", color: "GOLD", crn: "21938", time: "MW 01:00pm - 02:20pm", semester: "spring-1" },
+                { code: "MGT 420-04", name: "The Workforce", color: "GREEN", crn: "21939", time: "TuTh 10:10am - 11:30am", semester: "spring-1" },
+                { code: "MGT 420-05", name: "The Workforce", color: "BLUE", crn: "21940", time: "TuTh 01:00pm - 02:20pm", semester: "spring-1" },
+                { code: "MGT 422-01", name: "Operations Engine", color: "BLUE", crn: "21941", time: "MW 01:00pm - 02:20pm", semester: "spring-1" },
+                { code: "MGT 422-02", name: "Operations Engine", color: "RED", crn: "21942", time: "MW 02:40pm - 04:00pm", semester: "spring-1" },
+                { code: "MGT 422-03", name: "Operations Engine", color: "GOLD", crn: "21943", time: "TuTh 10:10am - 11:30am", semester: "spring-1" },
+                { code: "MGT 422-04", name: "Operations Engine", color: "SILVER", crn: "21944", time: "TuTh 01:00pm - 02:20pm", semester: "spring-1" },
+                { code: "MGT 422-05", name: "Operations Engine", color: "GREEN", crn: "21945", time: "TuTh 02:40pm - 04:00pm", semester: "spring-1" },
+                { code: "MGT 423-01", name: "Sourcing & Managing Funds", color: "BLUE", crn: "21946", time: "MW 10:10am - 11:30am", semester: "spring-1" },
+                { code: "MGT 423-02", name: "Sourcing & Managing Funds", color: "RED", crn: "21947", time: "MW 01:00pm - 02:20pm", semester: "spring-1" },
+                { code: "MGT 423-03", name: "Sourcing & Managing Funds", color: "GOLD", crn: "21948", time: "MW 02:40pm - 04:00pm", semester: "spring-1" },
+                { code: "MGT 423-04", name: "Sourcing & Managing Funds", color: "GREEN", crn: "21949", time: "TuTh 08:30am - 09:50am", semester: "spring-1" },
+                { code: "MGT 423-05", name: "Sourcing & Managing Funds", color: "SILVER", crn: "21950", time: "TuTh 10:10am - 11:30am", semester: "spring-1" },
+                { code: "MGT 421-01", name: "Innovator", color: "GREEN", crn: "21951", time: "MW 08:30am -09:50am", semester: "spring-2" },
+                { code: "MGT 421-02", name: "Innovator", color: "BLUE", crn: "21952", time: "MW 10:10am - 11:30am", semester: "spring-2" },
+                { code: "MGT 421-03", name: "Innovator", color: "SILVER", crn: "21953", time: "MW 01:00pm - 02:20pm", semester: "spring-2" },
+                { code: "MGT 421-04", name: "Innovator", color: "RED", crn: "21954", time: "TuTh 08:30am - 09:50am", semester: "spring-2" },
+                { code: "MGT 421-05", name: "Innovator", color: "GOLD", crn: "21955", time: "TuTh 10:10am - 11:30am", semester: "spring-2" },
+                { code: "MGT 425-01", name: "The Global Macroeconomy", color: "GOLD", crn: "21956", time: "TuTh 08:30am - 09:50am", semester: "spring-2" },
+                { code: "MGT 425-02", name: "The Global Macroeconomy", color: "SILVER", crn: "21957", time: "TuTh 10:10am - 11:30am", semester: "spring-2" },
+                { code: "MGT 425-03", name: "The Global Macroeconomy", color: "RED", crn: "21958", time: "TuTh 01:00pm - 02:20pm", semester: "spring-2" },
+                { code: "MGT 425-04", name: "The Global Macroeconomy", color: "BLUE", crn: "21959", time: "TuTh 02:40pm - 04:00pm", semester: "spring-2" },
+                { code: "MGT 425-05", name: "The Global Macroeconomy", color: "GREEN", crn: "21960", time: "TuTh 04:10pm - 05:30pm", semester: "spring-2" },
+                { code: "MGT 430-01", name: "The Executive", color: "RED", crn: "21961", time: "MW 10:10am - 11:30am", semester: "spring-2" },
+                { code: "MGT 430-02", name: "The Executive", color: "BLUE", crn: "21962", time: "MW 01:00pm - 02:20pm", semester: "spring-2" },
+                { code: "MGT 430-03", name: "The Executive", color: "GOLD", crn: "21963", time: "MW 02:40pm - 04:00pm", semester: "spring-2" },
+                { code: "MGT 430-04", name: "The Executive", color: "SILVER", crn: "21964", time: "TuTh 01:00pm - 02:20pm", semester: "spring-2" },
+                { code: "MGT 430-05", name: "The Executive", color: "GREEN", crn: "21965", time: "TuTh 02:40pm -04:00pm", semester: "spring-2" }
+            ];
+
+            // Initialize storage
+            let swapRequests = [];
+            let matchHistory = [];
+            
+            // Try to load from localStorage
+            try {
+                const savedRequests = localStorage.getItem('swapRequests');
+                const savedHistory = localStorage.getItem('matchHistory');
+                if (savedRequests) swapRequests = JSON.parse(savedRequests);
+                if (savedHistory) matchHistory = JSON.parse(savedHistory);
+                console.log('Loaded from localStorage:', { requests: swapRequests.length, history: matchHistory.length });
+            } catch (e) {
+                console.log('localStorage not available, using memory only');
+            }
+
+            // Extract course key for matching
+            function getCourseKey(courseString) {
+                const match = courseString.match(/CRN:\s*(\d+)/);
+                return match ? match[1] : null;
+            }
+
+            // Extract color code
+            function getColorCode(courseString) {
+                const match = courseString.match(/\((GOLD|SILVER|GREEN|BLUE|RED)\)/);
+                return match ? match[1] : null;
+            }
+
+            // Extract base course name (without section number)
+            function getBaseCourse(courseString) {
+                const match = courseString.match(/^(MGT\s+\d+)-\d+\s+([^(]+)/);
+                return match ? `${match[1]} ${match[2].trim()}` : null;
+            }
+
+            // Validate that preferences are same class different cohort
+            function validateSameClass(currentCourse, preferences) {
+                const baseCourse = getBaseCourse(currentCourse);
+                if (!baseCourse) return { valid: false, message: 'Invalid course format' };
+
+                for (let pref of preferences) {
+                    if (!pref) continue;
+                    
+                    const prefBase = getBaseCourse(pref);
+                    if (!prefBase) continue;
+                    
+                    if (prefBase !== baseCourse) {
+                        return { 
+                            valid: false, 
+                            message: `Cannot swap! You can only swap between different sections of the same class. Your current class is "${baseCourse}" but you selected "${prefBase}" as a preference.` 
+                        };
+                    }
+                }
+                
+                return { valid: true };
+            }
+
+            // Show banner
+            function showBanner(message, type = 'success') {
+                const container = document.getElementById('bannerContainer');
+                const banner = document.createElement('div');
+                banner.className = `banner banner-${type}`;
+                banner.innerHTML = `<span style="font-size: 24px;">${type === 'success' ? '✓' : type === 'warning' ? '⚠' : 'ℹ'}</span> ${message}`;
+                container.innerHTML = '';
+                container.appendChild(banner);
+                setTimeout(() => banner.remove(), 5000);
+            }
+
+            // Find direct matches
+            function findDirectMatch(newRequest) {
+                const currentCRN = getCourseKey(newRequest.currentCourse);
+                
+                for (let request of swapRequests) {
+                    if (request.matched) continue;
+                    
+                    const requestCurrentCRN = getCourseKey(request.currentCourse);
+                    const preferences = [request.pref1, request.pref2, request.pref3].filter(p => p);
+                    
+                    if (preferences.some(p => getCourseKey(p) === currentCRN)) {
+                        const newPrefs = [newRequest.pref1, newRequest.pref2, newRequest.pref3].filter(p => p);
+                        if (newPrefs.some(p => getCourseKey(p) === requestCurrentCRN)) {
+                            return { type: 'direct', request };
+                        }
+                    }
+                }
+                return null;
+            }
+
+            // Find circular matches
+            function findCircularMatch(newRequest) {
+                const baseCourse = newRequest.currentCourse.match(/MGT\s+\d+-\d+\s+([^(]+)/)?.[1]?.trim();
+                if (!baseCourse) return null;
+
+                const sameCourseRequests = swapRequests.filter(req => {
+                    if (req.matched) return false;
+                    const reqBase = req.currentCourse.match(/MGT\s+\d+-\d+\s+([^(]+)/)?.[1]?.trim();
+                    return reqBase === baseCourse;
+                });
+
+                const allRequests = [...sameCourseRequests, newRequest];
+
+                for (let chainLength = 3; chainLength <= Math.min(5, allRequests.length); chainLength++) {
+                    const chain = findChain(allRequests, chainLength);
+                    if (chain) return { type: 'circular', chain };
+                }
+
+                return null;
+            }
+
+            // Find a circular chain
+            function findChain(requests, targetLength) {
+                function buildChain(current, visited, chain) {
+                    if (chain.length === targetLength) {
+                        const lastCRN = getCourseKey(current.currentCourse);
+                        const firstPrefs = [chain[0].pref1, chain[0].pref2, chain[0].pref3].filter(p => p);
+                        if (firstPrefs.some(p => getCourseKey(p) === lastCRN)) {
+                            return chain;
+                        }
+                        return null;
+                    }
+
+                    const currentPrefs = [current.pref1, current.pref2, current.pref3].filter(p => p);
+                    
+                    for (let nextReq of requests) {
+                        if (visited.has(nextReq)) continue;
+                        
+                        const nextCRN = getCourseKey(nextReq.currentCourse);
+                        if (currentPrefs.some(p => getCourseKey(p) === nextCRN)) {
+                            visited.add(nextReq);
+                            const result = buildChain(nextReq, visited, [...chain, nextReq]);
+                            if (result) return result;
+                            visited.delete(nextReq);
+                        }
+                    }
+                    
+                    return null;
+                }
+
+                for (let startReq of requests) {
+                    const visited = new Set([startReq]);
+                    const result = buildChain(startReq, visited, [startReq]);
+                    if (result) return result;
+                }
+
+                return null;
+            }
+
+            // Display match result
+            function displayMatch(matchResult, newRequest) {
+                const container = document.getElementById('matchResultContainer');
+                
+                if (matchResult.type === 'direct') {
+                    const { request } = matchResult;
+                    
+                    // Extract readable course info
+                    const extractCourseInfo = (courseStr) => {
+                        const match = courseStr.match(/^(MGT\s+\d+-\d+)\s+([^(]+)\s+\(([^)]+)\)\s+CRN:\s*(\d+)\s+(.+?)\s+(spring-\d+)$/);
+                        if (match) {
+                            return {
+                                code: match[1],
+                                name: match[2].trim(),
+                                color: match[3],
+                                crn: match[4],
+                                time: match[5],
+                                semester: match[6]
+                            };
+                        }
+                        return null;
+                    };
+                    
+                    const newCurrent = extractCourseInfo(newRequest.currentCourse);
+                    const newWants = extractCourseInfo(newRequest.pref1);
+                    const reqCurrent = extractCourseInfo(request.currentCourse);
+                    const reqWants = extractCourseInfo(request.pref1);
+                    
+                    container.innerHTML = `
+                        <div class="match-result">
+                            <h3>🎉 Match Found!</h3>
+                            <div class="match-pair">
+                                <strong>${newRequest.studentName}</strong> (${newRequest.email})
+                                <div style="margin-top: 12px; line-height: 1.6;">
+                                    <div style="margin-bottom: 8px;">
+                                        <strong>Has:</strong> ${newCurrent ? `${newCurrent.code} ${newCurrent.name} (${newCurrent.color})` : newRequest.currentCourse.substring(0, 60)}<br>
+                                        <small style="opacity: 0.9;">${newCurrent ? `${newCurrent.time}` : ''}</small>
+                                    </div>
+                                    <div>
+                                        <strong>Wants:</strong> ${newWants ? `${newWants.code} ${newWants.name} (${newWants.color})` : newRequest.pref1.substring(0, 60)}<br>
+                                        <small style="opacity: 0.9;">${newWants ? `${newWants.time}` : ''}</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="match-arrow">⬇⬆</div>
+                            <div class="match-pair">
+                                <strong>${request.studentName}</strong> (${request.email})
+                                <div style="margin-top: 12px; line-height: 1.6;">
+                                    <div style="margin-bottom: 8px;">
+                                        <strong>Has:</strong> ${reqCurrent ? `${reqCurrent.code} ${reqCurrent.name} (${reqCurrent.color})` : request.currentCourse.substring(0, 60)}<br>
+                                        <small style="opacity: 0.9;">${reqCurrent ? `${reqCurrent.time}` : ''}</small>
+                                    </div>
+                                    <div>
+                                        <strong>Wants:</strong> ${reqWants ? `${reqWants.code} ${reqWants.name} (${reqWants.color})` : request.pref1.substring(0, 60)}<br>
+                                        <small style="opacity: 0.9;">${reqWants ? `${reqWants.time}` : ''}</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    
+                    request.matched = true;
+                    newRequest.matched = true;
+                    
+                    matchHistory.push({
+                        date: new Date().toISOString(),
+                        type: 'direct',
+                        participants: [newRequest, request]
+                    });
+                    
+                    saveData();
+                    showBanner(`Match found with ${request.studentName}! Email notifications sent.`, 'success');
+                    
+                } else if (matchResult.type === 'circular') {
+                    const { chain } = matchResult;
+                    const chainHTML = chain.map((req, idx) => `
+                        <div class="chain-step">
+                            <div class="step-number">${idx + 1}</div>
+                            <div>
+                                <strong>${req.studentName}</strong> (${req.email})<br>
+                                <small>Gives: ${req.currentCourse.match(/\((.*?)\)/)?.[1] || ''} → Gets: ${req.pref1.match(/\((.*?)\)/)?.[1] || ''}</small>
+                            </div>
+                        </div>
+                    `).join('');
+                    
+                    container.innerHTML = `
+                        <div class="match-result circular-match">
+                            <h3>🔄 Circular Match Found! (${chain.length}-way swap)</h3>
+                            <div class="circular-chain">
+                                ${chainHTML}
+                            </div>
+                        </div>
+                    `;
+                    
+                    chain.forEach(req => {
+                        const existingReq = swapRequests.find(r => 
+                            r.email === req.email && r.currentCourse === req.currentCourse
+                        );
+                        if (existingReq) existingReq.matched = true;
+                        req.matched = true;
+                    });
+                    
+                    matchHistory.push({
+                        date: new Date().toISOString(),
+                        type: 'circular',
+                        participants: chain
+                    });
+                    
+                    saveData();
+                    showBanner(`Circular match found with ${chain.length} participants! Email notifications sent.`, 'success');
+                }
+                
+                renderActiveRequests();
+                renderMatchHistory();
+            }
+
+            // Render active requests
+            function renderActiveRequests() {
+                const container = document.getElementById('activeRequests');
+                const active = swapRequests.filter(r => !r.matched);
+                
+                if (active.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">📋</div>
+                            <p>No active requests. ${swapRequests.length > 0 ? 'All requests have been matched!' : 'Submit the first one!'}</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                container.innerHTML = active.map(req => {
+                    const color = getColorCode(req.currentCourse);
+                    return `
+                        <div class="request-item">
+                            <div class="request-header">
+                                <div class="request-name">
+                                    ${req.studentName}
+                                    ${color ? `<span class="color-code color-${color}">${color}</span>` : ''}
+                                </div>
+                                <div class="request-date">${req.entryDate}</div>
+                            </div>
+                            <div class="course-info">
+                                <div class="course-label">Current Class</div>
+                                <div class="course-details">${req.currentCourse.substring(0, 80)}...</div>
+                            </div>
+                            <div class="course-info">
+                                <div class="course-label">Wants</div>
+                                <div class="course-details">1️⃣ ${req.pref1.substring(0, 60)}...</div>
+                                ${req.pref2 ? `<div class="course-details">2️⃣ ${req.pref2.substring(0, 60)}...</div>` : ''}
+                                ${req.pref3 ? `<div class="course-details">3️⃣ ${req.pref3.substring(0, 60)}...</div>` : ''}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            // Render match history
+            function renderMatchHistory() {
+                const container = document.getElementById('matchHistory');
+                
+                if (matchHistory.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">✨</div>
+                            <p>No matches found yet. Matches will appear here once connections are made.</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                container.innerHTML = matchHistory.map(match => {
+                    const date = new Date(match.date).toLocaleString();
+                    
+                    if (match.type === 'direct') {
+                        return `
+                            <div class="request-item matched">
+                                <div class="request-header">
+                                    <div class="request-name">✓ Direct Match</div>
+                                    <div class="request-date">${date}</div>
+                                </div>
+                                <div class="course-info">
+                                    ${match.participants.map(p => `
+                                        <strong>${p.studentName}</strong>: ${p.currentCourse.substring(0, 60)}... ⇄ ${p.pref1.substring(0, 60)}...
+                                    `).join('<br>')}
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        return `
+                            <div class="request-item matched">
+                                <div class="request-header">
+                                    <div class="request-name">🔄 Circular Match (${match.participants.length}-way)</div>
+                                    <div class="request-date">${date}</div>
+                                </div>
+                                <div class="course-info">
+                                    ${match.participants.map((p, idx) => `
+                                        ${idx + 1}. <strong>${p.studentName}</strong>
+                                    `).join(' → ')} → (loops back)
+                                </div>
+                            </div>
+                        `;
+                    }
+                }).join('');
+            }
+
+            // Save data to localStorage
+            function saveData() {
+                try {
+                    localStorage.setItem('swapRequests', JSON.stringify(swapRequests));
+                    localStorage.setItem('matchHistory', JSON.stringify(matchHistory));
+                    console.log('Data saved to localStorage');
+                } catch (e) {
+                    console.log('Could not save to localStorage:', e);
+                }
+            }
+
+            // Populate dropdowns
+            function populateDropdowns() {
+                const currentSelect = document.getElementById('currentCourse');
+                courses.forEach(course => {
+                    const option = document.createElement('option');
+                    option.value = `${course.code} ${course.name} (${course.color}) CRN: ${course.crn} ${course.time} ${course.semester}`;
+                    option.textContent = `${course.code} - ${course.name} (${course.color}) - ${course.time}`;
+                    currentSelect.appendChild(option);
+                });
+                console.log('Dropdowns populated');
+            }
+
+            // Update preference dropdowns based on current course
+            function updatePreferenceDropdowns() {
+                const currentCourse = document.getElementById('currentCourse').value;
+                if (!currentCourse) return;
+
+                const baseCourse = getBaseCourse(currentCourse);
+                const currentCRN = getCourseKey(currentCourse);
+                
+                const prefSelects = ['pref1', 'pref2', 'pref3'];
+                
+                prefSelects.forEach(selectId => {
+                    const select = document.getElementById(selectId);
+                    const currentValue = select.value;
+                    
+                    select.innerHTML = '<option value="">Select preference...</option>';
+                    
+                    courses.forEach(course => {
+                        const courseValue = `${course.code} ${course.name} (${course.color}) CRN: ${course.crn} ${course.time} ${course.semester}`;
+                        const courseBase = getBaseCourse(courseValue);
+                        const courseCRN = course.crn;
+                        
+                        if (courseBase === baseCourse && courseCRN !== currentCRN) {
+                            const option = document.createElement('option');
+                            option.value = courseValue;
+                            option.textContent = `${course.code} - ${course.name} (${course.color}) - ${course.time}`;
+                            select.appendChild(option);
+                        }
+                    });
+                    
+                    if (currentValue) {
+                        select.value = currentValue;
+                    }
+                });
+                
+                console.log('Preference dropdowns updated for:', baseCourse);
+            }
+
+            // Handle form submission
+            const form = document.getElementById('swapForm');
+            console.log('Form element:', form);
+            
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                console.log('=== FORM SUBMITTED ===');
+                
+                const entryDate = document.getElementById('entryDate').value;
+                const studentName = document.getElementById('studentName').value;
+                const netId = document.getElementById('netId').value;
+                const email = document.getElementById('email').value;
+                const currentCourse = document.getElementById('currentCourse').value;
+                const pref1 = document.getElementById('pref1').value;
+                const pref2 = document.getElementById('pref2').value;
+                const pref3 = document.getElementById('pref3').value;
+                
+                console.log('Form values:', { 
+                    entryDate, 
+                    studentName, 
+                    netId, 
+                    email, 
+                    currentCourse: currentCourse.substring(0, 50) + '...', 
+                    pref1: pref1.substring(0, 50) + '...' 
+                });
+                
+                // Validate required fields
+                if (!entryDate || !studentName || !netId || !email || !currentCourse || !pref1) {
+                    console.log('Validation failed - missing required fields');
+                    showBanner('Please fill in all required fields (Entry Date, Name, Net ID, Email, Current Course, and at least 1st Preference).', 'warning');
+                    return;
+                }
+                
+                // Validate same class different cohort
+                const validation = validateSameClass(currentCourse, [pref1, pref2, pref3]);
+                if (!validation.valid) {
+                    console.log('Validation failed - different classes');
+                    showBanner(validation.message, 'warning');
+                    return;
+                }
+                
+                const newRequest = {
+                    entryDate,
+                    studentName,
+                    netId,
+                    email,
+                    currentCourse,
+                    pref1,
+                    pref2,
+                    pref3,
+                    timestamp: new Date().toISOString(),
+                    matched: false
+                };
+                
+                console.log('New request created, checking for matches...');
+                
+                // Check for matches
+                const circularMatch = findCircularMatch(newRequest);
+                const directMatch = findDirectMatch(newRequest);
+                
+                console.log('Match results:', { circular: !!circularMatch, direct: !!directMatch });
+                
+                if (circularMatch) {
+                    console.log('Circular match found!');
+                    swapRequests.push(newRequest);
+                    displayMatch(circularMatch, newRequest);
+                } else if (directMatch) {
+                    console.log('Direct match found!');
+                    swapRequests.push(newRequest);
+                    displayMatch(directMatch, newRequest);
+                } else {
+                    console.log('No match found, storing request');
+                    swapRequests.push(newRequest);
+                    saveData();
+                    showBanner('✓ Your preference has been stored in the database. You will be notified when a match is found.', 'success');
+                    renderActiveRequests();
+                }
+                
+                // Reset form
+                form.reset();
+                console.log('Form reset');
+                
+                // Clear match display after 10 seconds
+                setTimeout(() => {
+                    const container = document.getElementById('matchResultContainer');
+                    if (container.innerHTML) {
+                        container.style.animation = 'fadeOut 0.5s ease-out';
+                        setTimeout(() => {
+                            container.innerHTML = '';
+                            container.style.animation = '';
+                        }, 500);
+                    }
+                }, 10000);
+            });
+
+            // Listen for current course changes
+            document.getElementById('currentCourse').addEventListener('change', updatePreferenceDropdowns);
+
+            // Initialize
+            console.log('Initializing app...');
+            populateDropdowns();
+            renderActiveRequests();
+            renderMatchHistory();
+            console.log('App initialized successfully!');
+        });
+    </script>
+</body>
+</html>
